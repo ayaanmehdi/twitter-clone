@@ -1,8 +1,8 @@
 import User from "../models/user.model.js";
-
+import generatejwtandcookie from "../utils/generatejwt.js";
 import bcrypt from "bcryptjs";
 
-import generatejwtandcookie from "../utils/generatejwt.js";
+
 
 export const signup = async (req, res) => {
   try{
@@ -38,7 +38,7 @@ export const signup = async (req, res) => {
   });
 
   if (newUser) {
-    generatejwtandcookie(newUser._id, res);
+    generatejwtandcookie(newUser._id,res)
 
     newUser.save();
 
@@ -78,13 +78,16 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: "Incorrect password" });
     }
 
-    generatejwtandcookie(user._id, res);
-
+    
+    generatejwtandcookie(user._id,res)
     res.status(200).json({
       _id: user._id,
       username: user.username,
+      fullname:user.fullname,
+      followers:user.followers,
+      following:user.following,
       profilepic: user.profilepic,
-    });
+    })
   } catch (error) {
     console.error(error,"-----");
     res.status(500).json({ error: "An error . Please try again later." });
@@ -92,6 +95,16 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req,res)=>{
-  res.cookie("jwt", "", { expires: new Date(0) });
+  res.cookie("jwt", "", { maxAge:0 });
   res.status(200).json({message:"loggedout sucessfully"})
 }
+
+export const getme = async (req,res)=>{
+   try {
+    const user = await User.findById(req.user._id).select("-password")
+    res.status(200).json(user)
+   } catch (error) {
+    res.status(400).json({error:"unauthrozed user"})
+   }
+}
+
