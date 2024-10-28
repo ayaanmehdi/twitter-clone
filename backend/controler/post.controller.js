@@ -58,6 +58,19 @@ export const deletePost = async (req, res) => {
   }
 };
 
+export const getLikedPosts = async (req,res)=>{
+  const userId = req.user._id;
+
+  const likedPosts = await Post.find({like:{$in:userId}}) ;
+
+  if(likedPosts.length===0){
+    return res.status(200).json({message:"no posts liked or  the posts you liked may have been deleted"})
+  }
+
+  res.status(200).json(likedPosts)
+
+}
+
 export const likePost = async (req, res) => {
 
     try {
@@ -142,6 +155,9 @@ export const getAllPosts = async (req,res)=>{
     const allposts = await Post.find().sort({createdAt:-1}).populate({
       path:"postedby",
       select:"-password"
+    }).populate({
+      path:"comments.user",
+      select:"-password"
     })
 
 if(allposts.length===0){
@@ -155,4 +171,42 @@ if(allposts.length===0){
      res.status(500).json({error:error.message})
      console.log(error)
     }
+}
+
+export const getFollowingPosts = async (req,res)=>{
+
+  try {
+
+  const userId = req.user._id;
+  
+  const user = await User.findById(userId);
+
+ 
+
+  const following = user.following;
+
+
+
+  if(following.length===0){
+    
+    return res.status(200).json({message:"follow users to get posts of them"})
+  }
+
+  const followingUserPosts = await Post.find({postedby:{$in:following}}).sort({createdAt:-1}).populate({
+    path:"postedby",
+    select:"-password"
+  }).populate({
+    path:"comments.user",
+    select:"-password"
+  })
+
+ 
+
+  res.status(200).json(followingUserPosts)
+
+} catch (error) {
+  res.status(500).json({error:error.message})
+  console.log(error)
+}
+
 }
