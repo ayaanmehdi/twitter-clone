@@ -5,7 +5,9 @@ import connectToMongoDB from "./db/connecttomongodb.js";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/user.route.js"
 import postRoute from "./routes/post.route.js"
+import notificationRoute from "./routes/notification.route.js"
 import {v2 as cloudinary} from "cloudinary"
+import { protectRoute } from "./controler/protectRoute.js";
 
 const PORT = 8000;
 const app = express();
@@ -27,6 +29,7 @@ app.use(cookieParser())
 app.use("/api/auth",authrouter)
 app.use("/user",userRoute)
 app.use("/api/post",postRoute)
+app.use("/api/notification",notificationRoute)
 
 
 app.listen(PORT,()=>{
