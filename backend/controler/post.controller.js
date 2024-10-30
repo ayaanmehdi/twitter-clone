@@ -210,3 +210,30 @@ export const getFollowingPosts = async (req,res)=>{
 }
 
 }
+
+export const getUserPosts = async (req,res)=>{
+
+  try {
+
+  const {username} = req.params
+
+  const user = await User.findOne({username})
+
+  if(!user) return res.status(404).json({error:"user not found"})
+
+  const userPosts = await Post.find({postedby:user._id}).sort({createdAt:-1}).populate({
+    path:"postedby",
+    select:"-password"
+  }).populate({
+    path:"comments.user",
+    select:"-password"
+  })
+
+  res.status(200).json(userPosts)
+
+      
+} catch (error) {
+  res.status(500).json({error:error.message})
+  console.log(error)
+}
+}
