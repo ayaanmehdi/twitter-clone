@@ -2,13 +2,43 @@ import XSvg from "../svgs/X";
 
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
+import toast from "react-hot-toast"
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import axios from "axios";
 
 const Sidebar = () => {
+	const queryClient = useQueryClient();
+
+	const {mutate:logout} = useMutation({
+		mutationFn: async ()=>{
+			try {
+
+				
+				const res = await axios.post("/api/auth/logout")
+
+				const data = res.data;
+
+				if(data.error){
+					throw new Error(data.error || "something went wrong")
+				}
+
+				
+			} catch (error) {
+				throw new Error(error.message)
+			}
+		},
+		onSuccess:()=>{
+			toast.success("logged out succesfully")
+			queryClient.invalidateQueries({queryKey:["isauthenticated"]})
+		}
+	})
+
+
 	const data = {
-		fullName: "John Doe",
+		fullname: "John Doe",
 		username: "johndoe",
 		profileImg: "/avatars/boy1.png",
 	};
@@ -61,10 +91,13 @@ const Sidebar = () => {
 						</div>
 						<div className='flex justify-between flex-1'>
 							<div className='hidden md:block'>
-								<p className='text-white font-bold text-sm w-20 truncate'>{data?.fullName}</p>
+								<p className='text-white font-bold text-sm w-20 truncate'>{data?.fullname}</p>
 								<p className='text-slate-500 text-sm'>@{data?.username}</p>
 							</div>
-							<BiLogOut className='w-5 h-5 cursor-pointer' />
+							<BiLogOut className='w-5 hover:bg-red-800  rounded-sm h-5 cursor-pointer' onClick={(e)=>{
+								e.preventDefault();
+								logout()
+							}} />
 						</div>
 					</Link>
 				)}

@@ -8,33 +8,34 @@ export const signup = async (req, res) => {
   try{
 
   
-  const { username, fullname, confirmPassword, password, gender } = req.body;
+  const { username, fullname, confirmPassword, password } = req.body;
 
-  const alreadyuser = await User.findOne({ username });
+  const alreadyusername = await User.findOne({ username });
+  const alreadyfullname = await User.findOne({ fullname })
 
-  if (alreadyuser) {
-    return res.status(400).json({ error: "user already exists" });
+  if (alreadyusername) {
+    return res.status(200).json({ error: "username has already taken" });
+  }
+  if (alreadyfullname) {
+    return res.status(200).json({ error: "fullname has already taken" });
   }
 
   const salts = 10;
 
   const hashedpassword = await bcrypt.hash(password, salts);
 
-  const boypic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-
-  const girlpic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
-
   if (confirmPassword !== password) {
-    return res.status(400).json({ error: "password don't match" });
+    return res.status(200).json({ error: "password don't match" });
+  }
+
+  if(password.length<6){
+    return res.status(200).json({ error: "password must be have 6 characters " });
   }
 
   const newUser = new User({
     username,
     fullname,
     password: hashedpassword,
-
-    gender,
-    profilepic: gender === "male" ? boypic : girlpic,
   });
 
   if (newUser) {
@@ -71,11 +72,11 @@ export const login = async (req, res) => {
     );
 
     if (!user) {
-      return res.status(400).json({ error: "Incorrect username" });
+      return res.status(200).json({ error: "Incorrect username" });
     }
 
     if (!passwordCorrect) {
-      return res.status(401).json({ error: "Incorrect password" });
+      return res.status(200).json({ error: "Incorrect password" });
     }
 
     
@@ -104,7 +105,7 @@ export const getme = async (req,res)=>{
     const user = await User.findById(req.user._id).select("-password")
     res.status(200).json(user)
    } catch (error) {
-    res.status(400).json({error:"unauthrozed user"})
+    res.status(401).json({error:"unauthrozed user"})
    }
 }
 
