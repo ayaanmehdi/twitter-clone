@@ -54,7 +54,7 @@ export const signup = async (req, res) => {
       coverimg:newUser.coverimg
      });
   }
-}catch{
+}catch(error){
   console.error(error,"-----");
   res.status(500).json({ error: "An error . Please try again later." });
 }

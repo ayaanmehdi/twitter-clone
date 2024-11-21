@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 const connectToMongoDB =  async () =>{
     try {
         
-mongoose.connect(process.env.LOCALHOST_URI)
+mongoose.connect(process.env.ONLINE_URI)
 
 
 log("connected to mongo")
