@@ -7,7 +7,6 @@ import userRoute from "./routes/user.route.js"
 import postRoute from "./routes/post.route.js"
 import notificationRoute from "./routes/notification.route.js"
 import {v2 as cloudinary} from "cloudinary"
-import { protectRoute } from "./controler/protectRoute.js";
 import path from "path"
 
 const PORT = 8000;
