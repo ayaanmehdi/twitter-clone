@@ -8,6 +8,7 @@ import postRoute from "./routes/post.route.js"
 import notificationRoute from "./routes/notification.route.js"
 import {v2 as cloudinary} from "cloudinary"
 import { protectRoute } from "./controler/protectRoute.js";
+import path from "path"
 
 const PORT = 8000;
 const app = express();
@@ -30,6 +31,19 @@ app.use("/api/auth",authrouter)
 app.use("/user",userRoute)
 app.use("/api/post",postRoute)
 app.use("/api/notification",notificationRoute)
+
+
+const __dirname = path.resolve()
+
+
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
+
 
 
 app.listen(PORT,()=>{
